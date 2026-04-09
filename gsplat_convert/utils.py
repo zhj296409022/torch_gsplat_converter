@@ -55,7 +55,6 @@ def kmeans_assign_faiss(
   data: torch.Tensor,
   centroids: torch.Tensor,
   chunk_size: int,
-  gpu_index: int = 0,
 ) -> torch.Tensor:
   if not _FAISS_AVAILABLE:
     raise RuntimeError('faiss is not available')
@@ -72,6 +71,9 @@ def kmeans_assign_faiss(
   gpu_resources = None
 
   if data_f32.is_cuda:
+    gpu_index = data_f32.device.index
+    if gpu_index is None:
+      gpu_index = torch.cuda.current_device()
     gpu_resources = faiss.StandardGpuResources()
     index = faiss.index_cpu_to_gpu(gpu_resources, gpu_index, index)
     index.add(centroids_f32)
@@ -96,11 +98,10 @@ def kmeans_assign(
   data: torch.Tensor,
   centroids: torch.Tensor,
   chunk_size: int,
-  faiss_gpu_index: int = 0,
 ) -> torch.Tensor:
   if _FAISS_AVAILABLE:
     try:
-      return kmeans_assign_faiss(data, centroids, chunk_size, gpu_index=faiss_gpu_index)
+      return kmeans_assign_faiss(data, centroids, chunk_size)
     except Exception:
       pass
   return kmeans_assign_torch(data, centroids, chunk_size)
@@ -109,7 +110,6 @@ def kmeans(
   data: torch.Tensor,
   k: int,
   iterations: int,
-  faiss_gpu_index: int = 0,
 ) -> tuple[torch.Tensor, torch.Tensor]:
   num_points, dims = data.shape
   k = max(1, min(int(k), int(num_points)))
@@ -123,7 +123,7 @@ def kmeans(
   chunk_size = max(1024, min(num_points, target_distance_elements // max(k, 1)))
 
   for _ in range(iterations):
-    labels = kmeans_assign(data, centroids, chunk_size, faiss_gpu_index=faiss_gpu_index)
+    labels = kmeans_assign(data, centroids, chunk_size)
 
     sums = torch.zeros((k, dims), dtype=data.dtype, device=data.device)
     counts = torch.bincount(labels, minlength=k)
@@ -145,16 +145,15 @@ def kmeans(
       break
     centroids = new_centroids
 
-  labels = kmeans_assign(data, centroids, chunk_size, faiss_gpu_index=faiss_gpu_index)
+  labels = kmeans_assign(data, centroids, chunk_size)
   return centroids, labels
 
 def cluster1d(
   data: torch.Tensor,
   iterations: int,
-  faiss_gpu_index: int = 0,
 ) -> tuple[torch.Tensor, torch.Tensor]:
   flat = data.transpose(0, 1).contiguous().reshape(-1, 1)
-  centroids, labels = kmeans(flat, min(256, flat.shape[0]), iterations, faiss_gpu_index=faiss_gpu_index)
+  centroids, labels = kmeans(flat, min(256, flat.shape[0]), iterations)
   centroids = centroids[:, 0]
   order = torch.argsort(centroids)
   inverse_order = torch.empty_like(order)
