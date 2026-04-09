@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "torch-gsplat-converter"
+name = "gsplat-convert"
 version = "0.1.0"
 description = "Convert Gaussian Splatting PLY assets to SOG packages"
 readme = "README.md"
@@ -18,7 +18,7 @@ dependencies = [
 faiss = ["faiss"]
 
 [project.scripts]
-torch-gsplat-converter = "gsplat_convert.cli:main"
+gsplat-convert = "gsplat_convert.cli:main"
 
 [tool.setuptools]
 include-package-data = false

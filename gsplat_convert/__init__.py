@@ -1,1 +1,1 @@
-"""torch_gsplat_converter package."""
+"""gsplat_convert package."""

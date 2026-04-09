@@ -140,7 +140,7 @@ def save_sog(
 
   meta = {
     'version': 2,
-    'asset': {'generator': 'torch_gsplat_converter'},
+    'asset': {'generator': 'gsplat_convert'},
     'count': num_rows,
     'means': {
       'mins': means_min.cpu().tolist(),

@@ -1,4 +1,4 @@
-# torch_gsplat_converter
+# gsplat_convert
 
 用于将 Gaussian Splatting 的 PLY 文件转换为 SOG 打包格式的轻量工具。
 
@@ -79,7 +79,7 @@ python -m gsplat_convert.cli ply2sog -i path/to/input.ply -o path/to/output.sog
 安装后也可以直接使用控制台命令：
 
 ```bash
-torch-gsplat-converter ply2sog -i path/to/input.ply -o path/to/output.sog
+gsplat-convert ply2sog -i path/to/input.ply -o path/to/output.sog
 ```
 
 参数说明：
