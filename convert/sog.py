@@ -11,7 +11,12 @@ from .utils import morton_sort_indices, log_transform, cluster1d, infer_sh_degre
 
 
 @torch.no_grad()
-def save_sog(splat_data: SplatData, output_path: str, kmeans_iterations: int = 10):
+def save_sog(
+  splat_data: SplatData,
+  output_path: str,
+  kmeans_iterations: int = 10,
+  faiss_gpu_index: int = 0,
+):
   num_rows = int(splat_data.num_splats)
   if num_rows <= 0:
     raise ValueError('No splats to export')
@@ -64,7 +69,7 @@ def save_sog(splat_data: SplatData, output_path: str, kmeans_iterations: int = 1
   quats_img[:num_rows, 3] = (252 + max_comp).to(torch.uint8).cpu().numpy()
   
   scales = splat_data.scales
-  scale_codebook, scale_labels = cluster1d(scales, kmeans_iterations)
+  scale_codebook, scale_labels = cluster1d(scales, kmeans_iterations, faiss_gpu_index=faiss_gpu_index)
   sorted_scales = sort_indices.cpu()
   scales_img = np.zeros((width * height, channels), dtype=np.uint8)
   scales_img[:num_rows, 0] = scale_labels[0 * num_rows + sort_indices].to(torch.uint8).cpu().numpy()
@@ -75,7 +80,7 @@ def save_sog(splat_data: SplatData, output_path: str, kmeans_iterations: int = 1
   sh0 = splat_data.features_dc.reshape(num_rows, -1).contiguous()
   if sh0.shape[1] != 3:
     raise ValueError(f'Expected SH0 to have 3 channels, got {sh0.shape[1]}')
-  color_codebook, color_labels = cluster1d(sh0, kmeans_iterations)
+  color_codebook, color_labels = cluster1d(sh0, kmeans_iterations, faiss_gpu_index=faiss_gpu_index)
 
   opacities = splat_data.opacities.reshape(num_rows).contiguous()
   opacity_alpha = (torch.sigmoid(opacities.index_select(0, sort_indices)) * 255.0).clamp(0.0, 255.0).to(torch.uint8)
@@ -103,9 +108,9 @@ def save_sog(splat_data: SplatData, output_path: str, kmeans_iterations: int = 1
       palette_power = min(64, int(2 ** math.floor(math.log2(num_rows / 1024.0))))
       palette_size = min(num_rows, max(1024, palette_power * 1024))
     print('sorted')
-    sh_centroids, sh_labels = kmeans(sh_flat, palette_size, kmeans_iterations)
+    sh_centroids, sh_labels = kmeans(sh_flat, palette_size, kmeans_iterations, faiss_gpu_index=faiss_gpu_index)
     print('sssss')
-    sh_codebook, sh_code_labels = cluster1d(sh_centroids, kmeans_iterations)
+    sh_codebook, sh_code_labels = cluster1d(sh_centroids, kmeans_iterations, faiss_gpu_index=faiss_gpu_index)
     actual_palette_size = int(sh_centroids.shape[0])
     print('sorted2')
     centroids_width = 64 * sh_coeffs

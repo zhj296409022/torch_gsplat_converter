@@ -1,8 +1,7 @@
-import os
 from convert.process import ply2sog
 from pathlib import Path
 
-if __name__ == '__main__':
+def main():
   import argparse
 
   parser = argparse.ArgumentParser(description='Convert gsplat file to other different formats.')
@@ -11,7 +10,11 @@ if __name__ == '__main__':
   parser.add_argument('--input_path', '-i', type=str, required=True, help='Path to the input file.')
   parser.add_argument('--output_path', '-o', type=str, help='Path to the output file.')
   parser.add_argument('--kmeans_iterations', '-k', type=int, default=10, help='Number of k-means iterations.')
+  parser.add_argument('--gpu_index', type=int, default=0, help='CUDA GPU index to use when not running on CPU.')
+  parser.add_argument('--cpu', action='store_true', help='Run on CPU instead of CUDA.')
   args = parser.parse_args()
+
+  device = 'cpu' if args.cpu else f'cuda:{args.gpu_index}'
   
   input_path = Path(args.input_path).resolve()
   
@@ -25,5 +28,8 @@ if __name__ == '__main__':
     output_path = output_path / input_path.with_suffix('.sog').name
   
   if args.task == 'ply2sog':
-    ply2sog(str(input_path), str(output_path), args.kmeans_iterations)
+    ply2sog(str(input_path), str(output_path), args.kmeans_iterations, device=device, faiss_gpu_index=args.gpu_index)
+
+if __name__ == '__main__':
+  main()
 
