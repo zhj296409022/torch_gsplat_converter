@@ -73,13 +73,13 @@ pip install .[faiss]
 在仓库根目录运行：
 
 ```bash
-python -m convert.cli ply2sog -i path\to\input.ply -o path\to\output.sog
+python -m gsplat_convert.cli ply2sog -i path/to/input.ply -o path/to/output.sog
 ```
 
 安装后也可以直接使用控制台命令：
 
 ```bash
-torch-gsplat-converter ply2sog -i path\to\input.ply -o path\to\output.sog
+torch-gsplat-converter ply2sog -i path/to/input.ply -o path/to/output.sog
 ```
 
 参数说明：
@@ -94,19 +94,19 @@ torch-gsplat-converter ply2sog -i path\to\input.ply -o path\to\output.sog
 示例：
 
 ```bash
-python -m convert.cli ply2sog -i ./data/scene.ply -o ./out/scene.sog -k 20
+python -m gsplat_convert.cli ply2sog -i ./data/scene.ply -o ./out/scene.sog -k 20
 ```
 
 指定 GPU 1：
 
 ```bash
-python -m convert.cli ply2sog -i ./data/scene.ply -o ./out/scene.sog --gpu_index 1
+python -m gsplat_convert.cli ply2sog -i ./data/scene.ply -o ./out/scene.sog --gpu_index 1
 ```
 
 使用 CPU：
 
 ```bash
-python -m convert.cli ply2sog -i ./data/scene.ply -o ./out/scene.sog --cpu
+python -m gsplat_convert.cli ply2sog -i ./data/scene.ply -o ./out/scene.sog --cpu
 ```
 
 如果 `--output_path` 指向目录，程序会在该目录下自动生成与输入文件同名的 `.sog` 文件。
@@ -132,7 +132,7 @@ python -m convert.cli ply2sog -i ./data/scene.ply -o ./out/scene.sog --cpu
 ## 项目结构
 
 ```text
-convert/
+gsplat_convert/
   cli.py       # 命令行入口
   process.py   # 转换流程编排
   reader.py    # PLY 读取与写出

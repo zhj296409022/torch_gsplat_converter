@@ -18,10 +18,10 @@ dependencies = [
 faiss = ["faiss"]
 
 [project.scripts]
-torch-gsplat-converter = "convert.cli:main"
+torch-gsplat-converter = "gsplat_convert.cli:main"
 
 [tool.setuptools]
 include-package-data = false
 
 [tool.setuptools.packages.find]
-include = ["convert*"]
+include = ["gsplat_convert*"]

@@ -1,4 +1,4 @@
-from convert.process import ply2sog
+from gsplat_convert.process import ply2sog
 from pathlib import Path
 
 def main():
